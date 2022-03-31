@@ -21,6 +21,8 @@ elif [ -e /dev/nvme0n1 ]; then
     export DEV_P3="${DEVICE}p3"
     export DEV_P4="${DEVICE}p4"
 else
+    echo "Unknown disk type - exiting!"
+    exit 1
 fi
 
 export PASSPHRASE='password'
