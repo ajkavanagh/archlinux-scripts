@@ -76,4 +76,5 @@ done
 if [[ -n "$install_groups" ]]; then
     echo "Installing groups:"
     echo $install_groups
+    pacstrap /mnt $install_groups
 fi
