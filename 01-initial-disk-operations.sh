@@ -11,7 +11,7 @@ are_you_sure "Are you sure - this will recreate the partition table; delete it a
 # patition the disk, zap it first
 sgdisk -Z $DEVICE
 # p1 is the EFI partion, 1GB
-sgdisk -n0:0:${P1_SIZE} -t0:ef02 -c0:"EFI Boot" $DEVICE
+sgdisk -n0:0:${P1_SIZE} -t0:ef00 -c0:"EFI Boot" $DEVICE
 # p2 is the LUKS encypted swap partion, 32GB
 sgdisk -n0:0:${P2_SIZE} -t0:8309 -c0:"LUKS Swap" $DEVICE
 # p3 is the LUKS encypted root partion, 100GB

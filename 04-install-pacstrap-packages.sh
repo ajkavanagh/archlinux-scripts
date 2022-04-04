@@ -10,6 +10,9 @@ is_mounted "/mnt" && {
     exit 1
 }
 
+# Update the mirror list
+reflector --save /etc/pacman.d/mirrorlist --protocol https --latest 5 --sort age
+
 # Now with the normal installation (but with extra btrfs packages)
 # base
 declare -a groups=(
@@ -20,19 +23,18 @@ declare -a groups=(
 declare -a pkgs=(
     base
     linux
+    linux-lts
     linux-firmware
-    cryptsetup
-    btrfs-progs
-    grub
-    grub-btrfs
     intel-ucode
+    cryptsetup
+    efibootmgr
+    btrfs-progs
     dosfstools
     efibootmgr
     e2fsprogs
     man-db
     man-pages
     texinfo
-    efibootmgr
     wpa_supplicant
     wireless_tools
     netctl

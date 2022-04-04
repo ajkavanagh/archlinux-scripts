@@ -33,3 +33,6 @@ export P3_SIZE="+15G"
 export P4_SIZE="0"    # rest of the disk
 
 export BTRFS_MOUNT_OPTIONS_="-o rw,noatime,noautodefrag,compress=zstd:1,ssd,space_cache=v2,subvol="
+
+# more specifics
+export HOSTNAME="alex-fw"
