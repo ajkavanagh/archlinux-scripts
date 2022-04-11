@@ -30,7 +30,7 @@ mount ${BTRFS_MOUNT_OPTIONS_}@srv /dev/mapper/root-crypt-p3 /mnt/srv
 mount ${BTRFS_MOUNT_OPTIONS_}@snapshots /dev/mapper/root-crypt-p3 /mnt/.snapshots
 
 # mount the efi partition in
-mount ${DEV_P1} /mnt/boot/efi
+mount ${DEV_P1} /mnt/boot
 
 # mount the btrfs into /home
 mount ${BTRFS_MOUNT_OPTIONS_}@ /dev/mapper/home-crypt-p4 /mnt/home

@@ -26,9 +26,9 @@ dd if=/dev/zero of=${DEV_P2} bs=1M count=10
 dd if=/dev/zero of=${DEV_P3} bs=1M count=10
 dd if=/dev/zero of=${DEV_P4} bs=1M count=10
 # then set them up
-echo -n "$PASSPHRASE" | cryptsetup --type luks2 luksFormat ${DEV_P2}
-echo -n "$PASSPHRASE" | cryptsetup --type luks2 luksFormat ${DEV_P3}
-echo -n "$PASSPHRASE" | cryptsetup --type luks2 luksFormat ${DEV_P4}
+echo -n "$PASSPHRASE" | cryptsetup --cipher aes-xts-plain64 --hash sha512 --use-random --type luks2 luksFormat ${DEV_P2}
+echo -n "$PASSPHRASE" | cryptsetup --cipher aes-xts-plain64 --hash sha512 --use-random --type luks2 luksFormat ${DEV_P3}
+echo -n "$PASSPHRASE" | cryptsetup --cipher aes-xts-plain64 --hash sha512 --use-random --type luks2 luksFormat ${DEV_P4}
 
 # Now open the LUKS partitions
 echo -n "$PASSPHRASE" | cryptsetup open ${DEV_P2} swap-crypt-p2
@@ -59,7 +59,7 @@ umount /mnt
 # volume to /mnt
 mount ${BTRFS_MOUNT_OPTIONS_}@ /dev/mapper/root-crypt-p3 /mnt
 # Then create all the mount points inside that subvolume:
-mkdir -p /mnt/{/boot/efi,home,var/cache/pacman/pkg,var/log,tmp,srv,.snapshots}
+mkdir -p /mnt/{boot,home,var/cache/pacman/pkg,var/log,tmp,srv,.snapshots}
 umount /mnt
 
 # create the /home @ btrfs subvolume

@@ -19,9 +19,6 @@ arch-chroot /mnt locale-gen
 
 echo "LANG=en_GB.UTF-8" > /mnt/etc/locale.conf
 
-# setup the keyboard
-echo "KEYMAP=uk" > /mnt/etc/vconsole.conf
-
 # Configure the hostname
 echo "$HOSTNAME" > /mnt/etc/hostname
 
@@ -34,3 +31,8 @@ cat << EOF > /mnt/etc/hosts
 127.0.1.1        $HOSTNAME
 EOF
 
+# set the password for root; this will be changed later!
+#arch-chroot /mnt chpasswd root:p
+
+# see if the alex user is created and set the passwd
+# arch-chroot /mnt chpassed alex:p

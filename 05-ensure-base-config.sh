@@ -10,6 +10,9 @@ is_mounted "/mnt" && {
     exit 1
 }
 
+# setup the keyboard
+echo "KEYMAP=uk" > /mnt/etc/vconsole.conf
+
 # generate the fstab file
 genfstab -U /mnt >> /mnt/etc/fstab
 
@@ -26,13 +29,13 @@ if [ ! -e "$MKINITCPIO_ORIG" ]; then
 fi
 
 # ensure that the MODULES, BINARIES, FILES and HOOKS are set
-#MODULES="MODULES=(vmd)"
-MODULES="MODULES=(virtio virtio_blk virtio_pci virtio_net)"
+#MODULES="MODULES=(btrfs vmd)"
+MODULES="MODULES=(btrfs virtio virtio_blk virtio_pci virtio_net)"
 BINARIES="BINARIES=(/usr/bin/btrfs)"
 # NOTE: we don't put the LUKS unlock key in the initramfs as it won't be
 # encrypted. Instead, the key will be enrolled in the TPM2 and the unified
 # kernel will be signed and secure booted.
-FILES="FILES=()"
+FILES="FILES=(/etc/crypttab /etc/passwd /etc/shadow)"
 # TODO: this needs modifying to the systemd-boot version and remove the extra
 # grub
 #HOOKS="HOOKS=(base udev autodetect modconf block encrypt filesystems keyboard keymap consolefont fsck)"
@@ -61,16 +64,16 @@ cat << EOF > $LINUX_PRESET
 ALL_config="/etc/mkinitcpio.conf"
 ALL_microcode=(/boot/*-ucode.img)
 
-PRESETS=('default' 'fallback')
+PRESETS=('arch' 'fallback')
 
-default_kver="/boot/vmlinuz-linux"
-default_image="/boot/initramfs-linux.img"
-default_efi_image="/boot/efi/EFI/Linux/archlinux-linux.efi"
-default_options="--splash /usr/share/systemd/bootctl/splash-arch.bmp"
+arch_kver="/boot/vmlinuz-linux"
+arch_image="/boot/initramfs-linux.img"
+arch_efi_image="/boot/EFI/Linux/archlinux-linux.efi"
+arch_options="--splash /usr/share/systemd/bootctl/splash-arch.bmp"
 
 fallback_kver="/boot/vmlinuz-linux-lts"
 fallback_image="/boot/initramfs-linux-lts-fallback.img"
-fallback_efi_image="/boot/efi/EFI/Linux/archlinux-linux-lts-fallback.efi"
+fallback_efi_image="/boot/EFI/Linux/archlinux-linux-lts-fallback.efi"
 fallback_options="-S autodetect --splash /usr/share/systemd/bootctl/splash-arch.bmp"
 EOF
 
@@ -97,9 +100,9 @@ EOF
 # home-crypt-p4 971990eb-fb4e-4149-801c-3a71e0056b65
 
 block_to_uuid=$(lsblk -f -oNAME,UUID -r)
-swap_UUID=$(echo "$block_to_uuid" | awk '/swap-crypt-p2/{ print $2 }')
-root_UUID=$(echo "$block_to_uuid" | awk '/root-crypt-p3/{ print $2 }')
-home_UUID=$(echo "$block_to_uuid" | awk '/home-crypt-p4/{ print $2 }')
+swap_UUID=$(echo "$block_to_uuid" | awk -v pat="$(basename $DEV_P2)" '$0~pat{ print $2 }')
+root_UUID=$(echo "$block_to_uuid" | awk -v pat="$(basename $DEV_P3)" '$0~pat{ print $2 }')
+home_UUID=$(echo "$block_to_uuid" | awk -v pat="$(basename $DEV_P4)" '$0~pat{ print $2 }')
 
 cmd_line=""
 cmd_line="$cmd_line rd.luks.name=${swap_UUID}=swap-crypt-p2"
@@ -107,6 +110,7 @@ cmd_line="$cmd_line rd.luks.name=${root_UUID}=root-crypt-p3"
 cmd_line="$cmd_line rd.luks.name=${home_UUID}=home-crypt-p4"
 cmd_line="$cmd_line rd.luks.options=timeout=30s"
 cmd_line="$cmd_line root=/dev/mapper/root-crypt-p3"
+cmd_line="$cmd_line rootflags=subvol=@"
 cmd_line="$cmd_line rootfstype=btrfs"
 #cmd_line="$cmd_line loglevel=3 resume=/dev/mapper/swap-crypt-p2"
 #cmd_line="$cmd_line rw bgrt_disable"
@@ -114,7 +118,38 @@ cmd_line="$cmd_line rw"
 
 echo $cmd_line > /mnt/etc/kernel/cmdline
 
+# Set up the /mnt/etc/crypttab file
+#CRYTPTTAB=/mnt/etc/crypttab
+#cat << EOF > $CRYTPTTAB
+## <target name>	<source device>		<key file>	<options>
+#root-crypt-p3	UUID=${root_UUID}	none	luks
+#swap-crypt-p2	UUID=${swap_UUID}	none	luks,swap
+#home-crypt-p4	UUID=${home_UUID}	none	luks
+#EOF
+
+# Create a boot loader entry:
+#LOADER_DIR=/mnt/boot/loader/entries
+#LOADER_ENTRY="${LOADER_DIR}/arch.conf"
+#mkdir -p "${LOADER_DIR}"
+#cat << EOF > $LOADER_ENTRY
+#title Arch
+#linux /vmlinuz-linux
+#initrd /intel-ucode.img
+#initrd /initramfs-linux.img
+#options rd.luks.name=${root_UUID}=root-crypt-p3 root=/dev/mapper/root-crypt-p3 rootflags=subvol=@ rw
+#EOF
+
+# create the options for the boot.
+LOADER_DIR="/mnt/boot/loader"
+LOADER_CONF="${LOADER_DIR}/loader.conf"
+mkdir -p "${LOADER_DIR}"
+cat << EOF > $LOADER_CONF
+timeout 5
+default arch
+console-mode 0
+EOF
+
 # finalliy regenerate the kernel
-mkdir -p /mnt/boot/efi/EFI/Linux
+#mkdir -p /mnt/boot/EFI/Linux
 arch-chroot /mnt mkinitcpio -P
-arch-chroot /mnt bootctl install --esp-path=/boot/efi
+arch-chroot /mnt bootctl install --esp-path=/boot
