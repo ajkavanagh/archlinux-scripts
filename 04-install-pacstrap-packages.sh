@@ -24,13 +24,13 @@ declare -a pkgs=(
     base
     linux
     linux-lts
+    binutils
     linux-firmware
     intel-ucode
     cryptsetup
     efibootmgr
     btrfs-progs
     dosfstools
-    efibootmgr
     e2fsprogs
     man-db
     man-pages
@@ -46,6 +46,8 @@ declare -a pkgs=(
     util-linux
     tlp
     powertop
+    openssh
+    rsync
 )
 
 install_pkgs=""

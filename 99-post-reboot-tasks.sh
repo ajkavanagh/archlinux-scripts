@@ -15,5 +15,9 @@ systemctl start tlp.service
 # Sync the time using ntp.
 systemctl enable systemd-timesyncd
 
+# Start the sshd server
+# TODO: disable this normally
+systemctl enable sshd.service
+
 # Reminder for root password.
 echo "!!! Remember to set a root password! - use passwd"

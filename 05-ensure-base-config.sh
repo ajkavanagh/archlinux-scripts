@@ -14,6 +14,13 @@ is_mounted "/mnt" && {
 echo "KEYMAP=uk" > /mnt/etc/vconsole.conf
 
 # generate the fstab file
+cat << EOF > /mnt/etc/fstab
+# Static information about the filesystems.
+# See fstab(5) for details.
+
+# <file system> <dir> <type> <options> <dump> <pass>
+EOF
+
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # assumptions: /mnt has to be mounted, and initial pacstrap is done.  Script
@@ -150,6 +157,6 @@ console-mode 0
 EOF
 
 # finalliy regenerate the kernel
-#mkdir -p /mnt/boot/EFI/Linux
+mkdir -p /mnt/boot/EFI/Linux
 arch-chroot /mnt mkinitcpio -P
 arch-chroot /mnt bootctl install --esp-path=/boot
