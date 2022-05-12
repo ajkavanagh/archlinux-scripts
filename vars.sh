@@ -23,8 +23,19 @@ else
     exit 1
 fi
 
+# Set up the device frendly names
+export BOOT_DEV="${DEV_P1}"
+export SWAP_DEV="${DEV_P2}"
+export ROOT_DEV="${DEV_P3}"
+export HOME_DEV="${DEV_P4}"
+
+# set up the crypt names
+export SWAP_CRYPT_NAME="swap-crypt-p2"
+export ROOT_CRYPT_NAME="root-crypt-p3"
+export HOME_CRYPT_NAME="home-crypt-p4"
+
 # This can be simple - it's going to be replaced with recovery keys
-export PASSPHRASE='password'
+export PASSPHRASE="password"
 
 # Set the sizes of the 4 partitions
 export P1_SIZE="+500M"

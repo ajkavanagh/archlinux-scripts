@@ -32,7 +32,7 @@ cat << EOF > /mnt/etc/hosts
 EOF
 
 # set the password for root; this will be changed later!
-#arch-chroot /mnt chpasswd root:p
+echo "root:p" | arch-chroot /mnt chpasswd
 
 # see if the alex user is created and set the passwd
-# arch-chroot /mnt chpassed alex:p
+#echo "alex:p" | arch-chroot /mnt chpasswd

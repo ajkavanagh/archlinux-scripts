@@ -1,4 +1,9 @@
 #!/bin/bash
+if [ "$USER" != "root" ]; then
+    echo "This script must be run as root"
+    exit 1
+fi
+
 set -e
 
 source ./vars.sh
@@ -14,6 +19,11 @@ systemctl start tlp.service
 
 # Sync the time using ntp.
 systemctl enable systemd-timesyncd
+systemctl start systemd-timesyncd
+
+# Ensure that we have networking
+systemctl enable NetworkManager
+systemctl start NetworkManager
 
 # Start the sshd server
 # TODO: disable this normally

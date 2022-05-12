@@ -28,3 +28,13 @@ function is_mounted {
     return 0
 }
 
+
+# returns 1 if the system is a kvm
+function is_kvm {
+    kvm=$(dmesg | grep "kvm-clock"||:)
+    echo "kvm is $kvm"
+    if [ -z "$kvm" ]; then
+        return 0
+    fi
+    return 1
+}

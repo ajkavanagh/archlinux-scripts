@@ -20,13 +20,16 @@ declare -a groups=(
 )
 
 # TODO: this mentions grub, but we are not using it.
+# NOTE: dracut before linux to avoid mkinitcpio coming in.
 declare -a pkgs=(
     base
+    dracut
     linux
     linux-lts
     binutils
     linux-firmware
     intel-ucode
+    sbsigntools
     cryptsetup
     efibootmgr
     btrfs-progs
@@ -48,6 +51,9 @@ declare -a pkgs=(
     powertop
     openssh
     rsync
+    git
+    sbctl
+    which
 )
 
 install_pkgs=""
